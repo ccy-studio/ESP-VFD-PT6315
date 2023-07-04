@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-04 17:20:57
+ * @LastEditTime: 2023-07-04 22:51:56
  */
 #include "pt6315.h"
 
@@ -24,18 +24,19 @@ void writeData(uint8_t data) {
     // > 200ns
     CLK_0;
     for (int i = 0; i < 8; i++) {
-        delay_us(1);
-        if ((data | 0x01)) {
+        delay_us(2);
+        if (data & 0x01) {
             DIN_1;
         } else {
             DIN_0;
         }
-        delay_us(1);
+        delay_us(2);
         CLK_1;
-        delay_us(1);
+        delay_us(2);
         CLK_0;
-        data <<= 1;
+        data >>= 1;
     }
+    delay_us(2);
 }
 
 /**
@@ -50,9 +51,9 @@ void setModeWirteDisplayMode(uint8_t addressMode = 0) {
     STB_1;
     delay_us(2);
     STB_0;
-    delay_us(1);
+    delay_us(2);
     writeData(command);
-    delay_us(1);
+    delay_us(2);
     STB_1;
 }
 
@@ -72,9 +73,9 @@ void setDisplayMode(uint8_t digit) {
     STB_1;
     delay_us(2);
     STB_0;
-    delay_us(1);
+    delay_us(2);
     writeData(digit);
-    delay_us(1);
+    delay_us(2);
     STB_1;
 }
 
@@ -92,16 +93,16 @@ void setDisplayMode(uint8_t digit) {
  * 111：脉冲宽度= 14/16 0x7
  */
 void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal) {
-    uint8_t command = 0x80 | brightnessVal;
-    if (onOff) {
-        command |= 0x8;
-    }
+    // uint8_t command = 0x80 | brightnessVal;
+    // if (onOff) {
+    //     command |= 0x8;
+    // }
     STB_1;
     delay_us(2);
     STB_0;
-    delay_us(1);
-    writeData(command);
-    delay_us(1);
+    delay_us(2);
+    writeData(0x8f);
+    delay_us(2);
     STB_1;
 }
 
@@ -116,12 +117,12 @@ void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]) {
     STB_1;
     delay_us(2);
     STB_0;
-    delay_us(1);
+    delay_us(2);
     writeData(0xc0 | startAddress);
-    delay_us(1);
+    delay_us(2);
     for (int i = 0; i < 3; i++) {
         writeData(dataArr[i]);
-        delay_us(1);
+        delay_us(2);
     }
     STB_1;
 }
@@ -138,19 +139,47 @@ void ptPrintString(int index, char* strAscii) {
     STB_1;
     delay_us(2);
     STB_0;
-    delay_us(1);
+    delay_us(2);
     writeData(0x00 + (index * 3));
-    delay_us(1);
+    delay_us(2);
     while (*strAscii) {
         int offset = *strAscii - '0';
         int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
         if (offset < len) {
             for (int i = 0; i < 3; i++) {
                 writeData(founts[offset][i]);
-                delay_us(1);
+                delay_us(2);
             }
         }
         strAscii++;
     }
     STB_1;
+}
+
+void test() {
+    setModeWirteDisplayMode(0);
+
+    uint8_t arr[3] = {0xff, 0xff, 0xff};
+    ptWriteRam(0, arr);
+    ptWriteRam(3, arr);
+    ptWriteRam(6, arr);
+
+    setDisplayMode(0x5);
+    ptSetDisplayLight(1, 7);
+
+    delay(100);
+}
+
+void testInit() {
+    setModeWirteDisplayMode(0);
+    STB_1;
+    delay_us(2);
+    STB_0;
+    delay_us(2);
+    writeData(0xc0);
+    delay_us(2);
+    STB_1;
+
+    setDisplayMode(0x5);
+    ptSetDisplayLight(1, 7);
 }

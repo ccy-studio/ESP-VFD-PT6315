@@ -2,24 +2,33 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 11:49:31
- * @LastEditTime: 2023-07-04 17:29:55
+ * @LastEditTime: 2023-07-04 22:46:26
  */
 #include <Arduino.h>
 #include "pt6315.h"
+// #include "vfd.h"
 
 void setup() {
     Serial.begin(115200);
-    ptInitGPIO();
-    ptInitialSetting(0, 0x5);
-    ptSetDisplayLight(1, 7);
+    Serial.println("Start!");
+    delay(2000);
+    // 设置PWM的频率单位hz
+    analogWriteFrequency(12000);
+    pinMode(GPIO_NUM_6, OUTPUT);
+    analogWrite(GPIO_NUM_6, 128);
 
-    printf("Init Success!\n");
+    ptInitGPIO();
+    testInit();
+
+    // // 初始化VFD
+    // VFD_Init();
+    // VFD_Clear();
+    // VFD_ClearAD();
+    // VFD_SetString(0, "Initializing");
+    // VFD_SetDisplayOnOff(DISPLAY_ON);
+    Serial.println("Init Success!");
 }
 
 void loop() {
-    uint8_t arr[3] = {0xff, 0xff, 0xff};
-    ptWriteRam(0, arr);
-    ptWriteRam(3, arr);
-    ptWriteRam(6, arr);
-    delay(100);
+    test();
 }

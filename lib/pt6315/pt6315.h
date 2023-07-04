@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:25
- * @LastEditTime: 2023-07-04 17:27:20
+ * @LastEditTime: 2023-07-04 20:58:18
  */
 #ifndef __PT6315__
 #define __PT6315__
@@ -16,11 +16,11 @@
 #include "pt6305_fount.h"
 
 #define CLK_PIN_GROUP 0
-#define CLK_PIN GPIO_NUM_1
+#define CLK_PIN GPIO_NUM_2
 #define DIN_PIN_GROUP 0
-#define DIN_PIN GPIO_NUM_2
+#define DIN_PIN GPIO_NUM_3
 #define STB_PIN_GROUP 0
-#define STB_PIN GPIO_NUM_3
+#define STB_PIN GPIO_NUM_10
 
 #define CLK_1 digitalWrite(CLK_PIN, HIGH)
 #define CLK_0 digitalWrite(CLK_PIN, LOW)
@@ -70,4 +70,7 @@ void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal);
 void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]);
 void ptPrintOne(int index, char ascii);
 void ptPrintString(int index, char* strAscii);
+
+void testInit();
+void test();
 #endif
