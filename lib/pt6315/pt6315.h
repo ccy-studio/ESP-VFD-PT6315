@@ -16,11 +16,11 @@
 #include "pt6305_fount.h"
 
 #define CLK_PIN_GROUP 0
-#define CLK_PIN GPIO_NUM_2
+#define CLK_PIN 14
 #define DIN_PIN_GROUP 0
-#define DIN_PIN GPIO_NUM_3
+#define DIN_PIN 12
 #define STB_PIN_GROUP 0
-#define STB_PIN GPIO_NUM_10
+#define STB_PIN 16
 
 #define CLK_1 digitalWrite(CLK_PIN, HIGH)
 #define CLK_0 digitalWrite(CLK_PIN, LOW)

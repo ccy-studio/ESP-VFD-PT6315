@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-04 22:51:56
+ * @LastEditTime: 2023-07-12 00:23:46
  */
 #include "pt6315.h"
 
@@ -157,14 +157,16 @@ void ptPrintString(int index, char* strAscii) {
 }
 
 void test() {
-    setModeWirteDisplayMode(0);
+    setModeWirteDisplayMode(1);
 
-    uint8_t arr[3] = {0xff, 0xff, 0xff};
+    uint8_t arr[3] = {0x1f, 0x2f, 0x3f};
+    uint8_t arr1[3] = {0x11, 0x32, 0x33};
+    uint8_t arr2[3] = {0x12, 0x22, 0x32};
     ptWriteRam(0, arr);
-    ptWriteRam(3, arr);
-    ptWriteRam(6, arr);
+    ptWriteRam(3, arr1);
+    ptWriteRam(6, arr2);
 
-    setDisplayMode(0x5);
+    setDisplayMode(4);
     ptSetDisplayLight(1, 7);
 
     delay(100);
