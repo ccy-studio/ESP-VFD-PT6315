@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-12 18:00:29
+ * @LastEditTime: 2023-07-12 21:51:36
  */
 #include "pt6315.h"
 
@@ -14,26 +14,28 @@ void ptInitGPIO(void) {
 #endif
 }
 
-void writeData(uint8_t data) {
+void writeData(uint8_t data, int delayState = 1) {
     // CLK 上升沿将会读取串行数据，DIN 为低位开始LSB
     // CLK PWCLK (Clock Pulse Width) ≥ 400 ns
     // DIN保持(Data Hold Time) ≥ 100 ns,tsetup (Data Setup Time) ≥ 100 ns  time
     // > 200ns
     CLK_0;
     for (int i = 0; i < 8; i++) {
-        delay_us(2);
+        delay_us(10);
         if (data & 0x01) {
             DIN_1;
         } else {
             DIN_0;
         }
-        delay_us(2);
+        delay_us(10);
         CLK_1;
-        delay_us(2);
+        delay_us(10);
         CLK_0;
         data >>= 1;
     }
-    delay_us(2);
+    if (delayState) {
+        delay_us(10);
+    }
 }
 
 /**
@@ -46,11 +48,11 @@ void setModeWirteDisplayMode(uint8_t addressMode) {
         command |= 0x4;
     }
     STB_1;
-    delay_us(2);
+    delay_us(10);
     STB_0;
-    delay_us(2);
+    delay_us(10);
     writeData(command);
-    delay_us(2);
+    delay_us(10);
     STB_1;
 }
 
@@ -68,11 +70,11 @@ void setModeWirteDisplayMode(uint8_t addressMode) {
  */
 void setDisplayMode(uint8_t digit) {
     STB_1;
-    delay_us(2);
+    delay_us(10);
     STB_0;
-    delay_us(2);
+    delay_us(10);
     writeData(digit);
-    delay_us(2);
+    delay_us(10);
     STB_1;
 }
 
@@ -95,45 +97,27 @@ void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal) {
     //     command |= 0x8;
     // }
     STB_1;
-    delay_us(2);
+    delay_us(10);
     STB_0;
-    delay_us(2);
+    delay_us(10);
     writeData(0x8f);
-    delay_us(2);
-    STB_1;
-}
-
-void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]) {
-    STB_1;
-    delay_us(2);
-    STB_0;
-    delay_us(2);
-    writeData(0xc0 | startAddress);
-    delay_us(2);
-    for (int i = 0; i < 3; i++) {
-        writeData(dataArr[i]);
-        delay_us(2);
-    }
+    delay_us(10);
     STB_1;
 }
 
 void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
     STB_1;
-    delay_us(2);
+    delay_us(10);
     STB_0;
-    delay_us(2);
+    delay_us(10);
     writeData(0xc0 | dig);
-    delay_us(2);
+    delay_us(10);
     // 写入数据
-    for (int i = 0; i < len; i++) {
-        if (data[i]) {
-            writeData(data[i]);
-        } else {
-            writeData(0);
-        }
-        delay_us(2);
+    for (size_t i = 0; i < len; i++) {
+        writeData(data[i],0);
+        // delay_us(10);
     }
-    delay_us(2);
+    delay_us(10);
     STB_1;
 }
 
@@ -147,18 +131,18 @@ void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
 
 // void ptPrintString(int index, char* strAscii) {
 //     STB_1;
-//     delay_us(2);
+//     delay_us(10);
 //     STB_0;
-//     delay_us(2);
+//     delay_us(10);
 //     writeData(0x00 + (index * 3));
-//     delay_us(2);
+//     delay_us(10);
 //     while (*strAscii) {
 //         int offset = *strAscii - '0';
 //         int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
 //         if (offset < len) {
 //             for (int i = 0; i < 3; i++) {
 //                 writeData(founts[offset][i]);
-//                 delay_us(2);
+//                 delay_us(10);
 //             }
 //         }
 //         strAscii++;
@@ -185,11 +169,11 @@ void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
 // void testInit() {
 //     setModeWirteDisplayMode(0);
 //     STB_1;
-//     delay_us(2);
+//     delay_us(10);
 //     STB_0;
-//     delay_us(2);
+//     delay_us(10);
 //     writeData(0xc0);
-//     delay_us(2);
+//     delay_us(10);
 //     STB_1;
 
 //     setDisplayMode(0x5);

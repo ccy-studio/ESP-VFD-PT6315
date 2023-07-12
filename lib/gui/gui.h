@@ -13,17 +13,19 @@
 #define u16 uint16_t
 #define u32 uint32_t
 
-#define VFD_GUI_FONT_LEN 36
+#define VFD_GUI_FONT_LEN 37
 
 typedef struct {
     u8 font[2];
-    char* text;
+    char text;
 } vfd_gui_fonts;
 
 extern vfd_gui_fonts fonts[VFD_GUI_FONT_LEN];
 
 void vfd_gui_init();
-void vfd_gui_set_one_text(u8 index, char* oneChar);
+void vfd_gui_clear();
+void vfd_gui_set_one_text(size_t index, char oneChar);
 void vfd_gui_set_text(char* string);
+void vfd_gui_set_colon(u8 display_state);
 
 #endif

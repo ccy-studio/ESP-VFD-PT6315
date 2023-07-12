@@ -51,6 +51,5 @@ void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal);
 void setModeWirteDisplayMode(uint8_t addressMode = 0);
 void setDisplayMode(uint8_t digit);
 void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]);
-void writeData(uint8_t data);
 void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len);
 #endif
