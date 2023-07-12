@@ -21,12 +21,10 @@ void setup() {
     analogWrite(PWM_PIN, 128);
 
     ptInitGPIO();
-    testInit();
     Serial.println("Init Success!");
 }
 
 void loop() {
-    test();
     delay(500);
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 }

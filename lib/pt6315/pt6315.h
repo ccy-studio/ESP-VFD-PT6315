@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:25
- * @LastEditTime: 2023-07-04 20:58:18
+ * @LastEditTime: 2023-07-12 15:22:58
  */
 #ifndef __PT6315__
 #define __PT6315__
@@ -12,8 +12,6 @@
 #if PT_PLATFORM == ESPMCU
 #include <Arduino.h>
 #endif
-
-#include "pt6305_fount.h"
 
 #define CLK_PIN_GROUP 0
 #define CLK_PIN 14
@@ -37,22 +35,6 @@
 void ptInitGPIO(void);
 
 /**
- * 初始化
- * @param addressMode 地址模式 0自增, 1固定地址模式
- * @param digit 显示模式设置命令 ↓
- * 0000 ： 4位， 24段
- * 0001 ：5位， 23段
- * 0010 ： 6位数字， 22段
- * 0011 ： 7位， 21段
- * 0100 ： 8位， 20段
- * 0101 ： 9位， 19段
- * 0110 ： 10位， 18段
- * 0111 ： 11位， 17段
- * 1XXX ： 12位， 16段
- */
-void ptInitialSetting(uint8_t addressMode, uint8_t digit);
-
-/**
  * 显示控制命令  COMMANDS 4
  * @param onOff 0显示关闭，1开启显示
  * @param brightnessVal 亮度占空比 0~7调整
@@ -66,11 +48,9 @@ void ptInitialSetting(uint8_t addressMode, uint8_t digit);
  * 111：脉冲宽度= 14/16 0x7
  */
 void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal);
-
+void setModeWirteDisplayMode(uint8_t addressMode = 0);
+void setDisplayMode(uint8_t digit);
 void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]);
-void ptPrintOne(int index, char ascii);
-void ptPrintString(int index, char* strAscii);
-
-void testInit();
-void test();
+void writeData(uint8_t data);
+void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len);
 #endif

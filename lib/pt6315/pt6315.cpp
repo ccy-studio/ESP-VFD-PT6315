@@ -2,12 +2,9 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-12 00:23:46
+ * @LastEditTime: 2023-07-12 18:00:29
  */
 #include "pt6315.h"
-
-static uint8_t currentAddressMode = 0;  // 地址模式 0自增, 1固定地址模式
-static uint8_t currentDigitMode = 5;
 
 void ptInitGPIO(void) {
 #if PT_PLATFORM == ESPMCU
@@ -43,7 +40,7 @@ void writeData(uint8_t data) {
  * DATA SETTING COMMANDS 2
  * @param addressMode 地址模式 0自增, 1固定地址模式
  */
-void setModeWirteDisplayMode(uint8_t addressMode = 0) {
+void setModeWirteDisplayMode(uint8_t addressMode) {
     uint8_t command = 0x40;
     if (addressMode) {
         command |= 0x4;
@@ -106,13 +103,6 @@ void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal) {
     STB_1;
 }
 
-void ptInitialSetting(uint8_t addressMode, uint8_t digit) {
-    setModeWirteDisplayMode(addressMode);
-    setDisplayMode(digit);
-    currentAddressMode = addressMode;
-    currentDigitMode = digit;
-}
-
 void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]) {
     STB_1;
     delay_us(2);
@@ -127,61 +117,81 @@ void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]) {
     STB_1;
 }
 
-void ptPrintOne(int index, char ascii) {
-    int offset = ascii - '0';
-    int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
-    if (offset < len) {
-        ptWriteRam(0x00 + (index * 3), (uint8_t*)founts[offset]);
-    }
-}
-
-void ptPrintString(int index, char* strAscii) {
+void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
     STB_1;
     delay_us(2);
     STB_0;
     delay_us(2);
-    writeData(0x00 + (index * 3));
+    writeData(0xc0 | dig);
     delay_us(2);
-    while (*strAscii) {
-        int offset = *strAscii - '0';
-        int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
-        if (offset < len) {
-            for (int i = 0; i < 3; i++) {
-                writeData(founts[offset][i]);
-                delay_us(2);
-            }
+    // 写入数据
+    for (int i = 0; i < len; i++) {
+        if (data[i]) {
+            writeData(data[i]);
+        } else {
+            writeData(0);
         }
-        strAscii++;
+        delay_us(2);
     }
+    delay_us(2);
     STB_1;
 }
 
-void test() {
-    setModeWirteDisplayMode(1);
+// void ptPrintOne(int index, char ascii) {
+//     int offset = ascii - '0';
+//     int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
+//     if (offset < len) {
+//         ptWriteRam(0x00 + (index * 3), (uint8_t*)founts[offset]);
+//     }
+// }
 
-    uint8_t arr[3] = {0x1f, 0x2f, 0x3f};
-    uint8_t arr1[3] = {0x11, 0x32, 0x33};
-    uint8_t arr2[3] = {0x12, 0x22, 0x32};
-    ptWriteRam(0, arr);
-    ptWriteRam(3, arr1);
-    ptWriteRam(6, arr2);
+// void ptPrintString(int index, char* strAscii) {
+//     STB_1;
+//     delay_us(2);
+//     STB_0;
+//     delay_us(2);
+//     writeData(0x00 + (index * 3));
+//     delay_us(2);
+//     while (*strAscii) {
+//         int offset = *strAscii - '0';
+//         int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
+//         if (offset < len) {
+//             for (int i = 0; i < 3; i++) {
+//                 writeData(founts[offset][i]);
+//                 delay_us(2);
+//             }
+//         }
+//         strAscii++;
+//     }
+//     STB_1;
+// }
 
-    setDisplayMode(4);
-    ptSetDisplayLight(1, 7);
+// void test() {
+//     setModeWirteDisplayMode(1);
 
-    delay(100);
-}
+//     uint8_t arr[3] = {0x1f, 0x2f, 0x3f};
+//     uint8_t arr1[3] = {0x11, 0x32, 0x33};
+//     uint8_t arr2[3] = {0x12, 0x22, 0x32};
+//     ptWriteRam(0, arr);
+//     ptWriteRam(3, arr1);
+//     ptWriteRam(6, arr2);
 
-void testInit() {
-    setModeWirteDisplayMode(0);
-    STB_1;
-    delay_us(2);
-    STB_0;
-    delay_us(2);
-    writeData(0xc0);
-    delay_us(2);
-    STB_1;
+//     setDisplayMode(4);
+//     ptSetDisplayLight(1, 7);
 
-    setDisplayMode(0x5);
-    ptSetDisplayLight(1, 7);
-}
+//     delay(100);
+// }
+
+// void testInit() {
+//     setModeWirteDisplayMode(0);
+//     STB_1;
+//     delay_us(2);
+//     STB_0;
+//     delay_us(2);
+//     writeData(0xc0);
+//     delay_us(2);
+//     STB_1;
+
+//     setDisplayMode(0x5);
+//     ptSetDisplayLight(1, 7);
+// }
