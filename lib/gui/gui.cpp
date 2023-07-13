@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-12 14:14:04
- * @LastEditTime: 2023-07-13 15:13:23
+ * @LastEditTime: 2023-07-13 21:41:32
  */
 #include "gui.h"
 
@@ -56,8 +56,8 @@ void vfd_gui_set_text(const char* string) {
         printf("长度不可以大于8位可显示的区域!");
         return;
     }
-    size_t len = 3 * str_len;
-    u8 data[len];
+    u8 data[24];
+    memset(data, 0, sizeof(data));
     size_t index = 0;
     for (size_t i = 0; i < str_len; i++) {
         for (size_t j = 0; j < VFD_GUI_FONT_LEN; j++) {
@@ -76,7 +76,7 @@ void vfd_gui_set_text(const char* string) {
         dig4_colon_flag = 0;
     }
     setModeWirteDisplayMode(0);               // command2
-    sendDigAndData(0, data, len);             // command3
+    sendDigAndData(0, data, 24);              // command3
     setDisplayMode(4);                        // command1
     ptSetDisplayLight(lightOff, lightLevel);  // command4
 }

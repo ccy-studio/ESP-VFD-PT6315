@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 11:49:31
- * @LastEditTime: 2023-07-13 15:18:13
+ * @LastEditTime: 2023-07-13 22:55:05
  */
 #include <Arduino.h>
 #include <DNSServer.h>
@@ -39,7 +39,10 @@ u8 gui_page_1_style = 0;
 
 u8 wifi_conn = 0;
 
-void handleKeyInterrupt();
+u32 key_filter_sec = 0;  // 按键防抖
+u8 last_key_pin = 0;
+
+IRAM_ATTR void handleKeyInterrupt();
 void configModeCallback(WiFiManager* myWiFiManager);
 void getTimeInfo();
 
@@ -69,21 +72,26 @@ void setup() {
     digitalWrite(LED_PIN, LOW);
 
     // 初始化VFD
-    delay(2000);
+    delay(3000);
     vfd_gui_init();
     vfd_gui_set_text("wifi....");
 
+    printf("WIFI SSID:%s\n", wifiManager.getWiFiSSID().c_str());
+    printf("WIFI PWD:%s\n", wifiManager.getWiFiPass().c_str());
+
     wifiManager.setAPCallback(configModeCallback);
+    wifiManager.setCountry("CN");
     wifiManager.setBreakAfterConfig(true);
-    wifiManager.setMinimumSignalQuality(10);
+    wifiManager.setTimeout(60);
     // wifiManager.setDebugOutput(false);
     String ssid = "VFD-" + String(ESP.getChipId());
     if (!wifiManager.autoConnect(ssid.c_str(), NULL)) {
         Serial.println("Failed to connect and hit timeout.");
-        delay(3000);
-        // 重启ESP8266
-        ESP.restart();
-        delay(5000);
+        while (1) {
+            delay(500);
+            digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+            vfd_gui_set_text("timeout.");
+        }
     }
 
     // 配网成功，打印连接信息
@@ -94,7 +102,8 @@ void setup() {
 
     digitalWrite(LED_PIN, HIGH);
     vfd_gui_clear();
-    vfd_gui_set_text("Request.");
+    vfd_gui_set_text("loading.");
+    getTimeInfo();
 }
 
 void loop() {
@@ -108,6 +117,7 @@ void loop() {
             if (gui_page_1_style) {
                 time_str += ">>";
                 time_str += (timeinfo.tm_hour < 10 ? "0" : "");
+                time_str += timeinfo.tm_hour;
                 time_str += (timeinfo.tm_min < 10 ? "0" : "");
                 time_str += timeinfo.tm_min;
                 time_str += "<<";
@@ -137,50 +147,48 @@ void loop() {
             time_str += timeinfo.tm_mday;
             colon = 0;
         }
-        vfd_gui_clear();
         vfd_gui_set_text(time_str.c_str());
         vfd_gui_set_colon(colon);
     } else {
         // Wifi断开
-        vfd_gui_clear();
         vfd_gui_set_text("wififail");
         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     }
 }
 
-void handleKeyInterrupt() {
-    if (digitalRead(KEY1_PIN)) {
+IRAM_ATTR void handleKeyInterrupt() {
+    u32 filter_sec = (micros() - key_filter_sec) / 1000;
+    if (filter_sec < 500) {
+        return;
+    }
+    if (!digitalRead(KEY1_PIN)) {
         // typec一侧的按键
         k1_last_time = micros();
         display_bck = !display_bck;
         vfd_gui_set_bck(display_bck);
-    } else {
+        last_key_pin = KEY1_PIN;
+    } else if (digitalRead(KEY1_PIN)) {
         // 低电平
-        u8 sec = (micros() - k1_last_time) / 1000;
-        if (sec >= 2000) {
+        u32 sec = (micros() - k1_last_time) / 1000;
+        if (k1_last_time != 0 && sec > 2000 && last_key_pin == KEY1_PIN) {
             // 如果长按到松下有2秒,执行重置WIFI的操作
-            display_bck = 1;
-            colon = 0;
-            vfd_gui_set_bck(display_bck);
-            vfd_gui_clear();
-            wifiManager.resetSettings();
-            vfd_gui_set_text("cleared.");
-            Serial.println("WiFi settings cleared.");
-            for (int i = 0; i < 3; i++) {
-                digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-                delay(200);
-            }
-            vfd_gui_clear();
-            vfd_gui_set_text("restart.");
+            wifiManager.erase();
             ESP.restart();
+        } else {
+            k1_last_time = 0;
         }
     }
-    if (digitalRead(KEY2_PIN)) {
+    if (!digitalRead(KEY2_PIN)) {
         gui_page = !gui_page;
+        k1_last_time = 0;
+        last_key_pin = KEY2_PIN;
     }
-    if (digitalRead(KEY3_PIN)) {
+    if (!digitalRead(KEY3_PIN)) {
         gui_page_1_style = !gui_page_1_style;
+        k1_last_time = 0;
+        last_key_pin = KEY3_PIN;
     }
+    key_filter_sec = micros();
 }
 
 void configModeCallback(WiFiManager* myWiFiManager) {
