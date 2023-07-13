@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-12 15:36:22
- * @LastEditTime: 2023-07-12 23:39:25
+ * @LastEditTime: 2023-07-13 15:08:00
  */
 
 /*
@@ -157,12 +157,36 @@ Z
         1- p1,p4,p15,p11,p13
         0-oa
 
+-
+	1- p8,p15,p7
+	o- oa
+
+.
+	1- p12
+	0-oa
+
+>
+	1- p3,p11,p15,p7
+	0-oa
+
+:
+	1- p2
+	0- oa
+
+/
+	1- p4,p15,p11
+	0- oa
+
+<
+	1- p8,p15,p4,p12
+	0-oa
+
 */
 
 /*
     Java生成C代码工具
 
-    
+
 public class Test1 {
 
     public static void main(String[] args) throws Exception {
@@ -227,5 +251,6 @@ vfd_gui_fonts fonts[VFD_GUI_FONT_LEN] = {
     {{0x31, 0x1b}, 'Q'}, {{0xf1, 0x4a}, 'R'}, {{0xe1, 0x51}, 'S'},
     {{0x3, 0x40}, 'T'},  {{0x30, 0x13}, 'U'}, {{0x28, 0x46}, 'V'},
     {{0x30, 0x4f}, 'W'}, {{0xc, 0x4c}, 'X'},  {{0xf0, 0x51}, 'Y'},
-    {{0x9, 0x54}, 'Z'},
-};
+    {{0x9, 0x54}, 'Z'},  {{0xc0, 0x40}, '-'}, {{0x0, 0x8}, '.'},
+    {{0x44, 0x44}, '>'}, {{0x2, 0x0}, ':'},   {{0x8, 0x44}, '/'},
+    {{0x88, 0x48}, '<'}};

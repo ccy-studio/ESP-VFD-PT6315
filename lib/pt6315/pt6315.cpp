@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-12 21:51:36
+ * @LastEditTime: 2023-07-13 15:11:09
  */
 #include "pt6315.h"
 
@@ -120,62 +120,3 @@ void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
     delay_us(10);
     STB_1;
 }
-
-// void ptPrintOne(int index, char ascii) {
-//     int offset = ascii - '0';
-//     int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
-//     if (offset < len) {
-//         ptWriteRam(0x00 + (index * 3), (uint8_t*)founts[offset]);
-//     }
-// }
-
-// void ptPrintString(int index, char* strAscii) {
-//     STB_1;
-//     delay_us(10);
-//     STB_0;
-//     delay_us(10);
-//     writeData(0x00 + (index * 3));
-//     delay_us(10);
-//     while (*strAscii) {
-//         int offset = *strAscii - '0';
-//         int len = sizeof(founts) / (3 * sizeof(founts[0][0]));
-//         if (offset < len) {
-//             for (int i = 0; i < 3; i++) {
-//                 writeData(founts[offset][i]);
-//                 delay_us(10);
-//             }
-//         }
-//         strAscii++;
-//     }
-//     STB_1;
-// }
-
-// void test() {
-//     setModeWirteDisplayMode(1);
-
-//     uint8_t arr[3] = {0x1f, 0x2f, 0x3f};
-//     uint8_t arr1[3] = {0x11, 0x32, 0x33};
-//     uint8_t arr2[3] = {0x12, 0x22, 0x32};
-//     ptWriteRam(0, arr);
-//     ptWriteRam(3, arr1);
-//     ptWriteRam(6, arr2);
-
-//     setDisplayMode(4);
-//     ptSetDisplayLight(1, 7);
-
-//     delay(100);
-// }
-
-// void testInit() {
-//     setModeWirteDisplayMode(0);
-//     STB_1;
-//     delay_us(10);
-//     STB_0;
-//     delay_us(10);
-//     writeData(0xc0);
-//     delay_us(10);
-//     STB_1;
-
-//     setDisplayMode(0x5);
-//     ptSetDisplayLight(1, 7);
-// }

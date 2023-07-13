@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:25
- * @LastEditTime: 2023-07-12 15:22:58
+ * @LastEditTime: 2023-07-13 15:11:17
  */
 #ifndef __PT6315__
 #define __PT6315__
@@ -50,6 +50,5 @@ void ptInitGPIO(void);
 void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal);
 void setModeWirteDisplayMode(uint8_t addressMode = 0);
 void setDisplayMode(uint8_t digit);
-void ptWriteRam(uint8_t startAddress, uint8_t dataArr[3]);
 void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len);
 #endif

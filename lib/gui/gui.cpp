@@ -2,9 +2,11 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-12 14:14:04
- * @LastEditTime: 2023-07-12 23:34:17
+ * @LastEditTime: 2023-07-13 15:13:23
  */
 #include "gui.h"
+
+extern vfd_gui_fonts fonts[VFD_GUI_FONT_LEN];
 
 u8 lightOff = 1;
 u8 lightLevel = 7;
@@ -48,7 +50,7 @@ void vfd_gui_set_one_text(size_t index, char oneChar) {
     ptSetDisplayLight(lightOff, lightLevel);  // command4
 }
 
-void vfd_gui_set_text(char* string) {
+void vfd_gui_set_text(const char* string) {
     size_t str_len = strlen(string);
     if (str_len > 8) {
         printf("长度不可以大于8位可显示的区域!");
@@ -89,4 +91,8 @@ void vfd_gui_set_colon(u8 display_state) {
     sendDigAndData(0x0A, &command, 1);        // command3
     setDisplayMode(4);                        // command1
     ptSetDisplayLight(lightOff, lightLevel);  // command4
+}
+
+void vfd_gui_set_bck(u8 onOff) {
+    lightOff = onOff;
 }
