@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-13 15:11:09
+ * @LastEditTime: 2023-07-14 16:12:49
  */
 #include "pt6315.h"
 
@@ -92,15 +92,15 @@ void setDisplayMode(uint8_t digit) {
  * 111：脉冲宽度= 14/16 0x7
  */
 void ptSetDisplayLight(uint8_t onOff, uint8_t brightnessVal) {
-    // uint8_t command = 0x80 | brightnessVal;
-    // if (onOff) {
-    //     command |= 0x8;
-    // }
+    uint8_t command = 0x80 | brightnessVal;
+    if (onOff) {
+        command |= 0x8;
+    }
     STB_1;
     delay_us(10);
     STB_0;
     delay_us(10);
-    writeData(0x8f);
+    writeData(command);
     delay_us(10);
     STB_1;
 }

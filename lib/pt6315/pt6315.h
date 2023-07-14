@@ -2,8 +2,11 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:25
- * @LastEditTime: 2023-07-13 15:11:17
+ * @LastEditTime: 2023-07-14 16:17:17
  */
+
+//blog-address: saisaiwa.com
+
 #ifndef __PT6315__
 #define __PT6315__
 
@@ -20,6 +23,8 @@
 #define STB_PIN_GROUP 0
 #define STB_PIN 16
 
+#if PT_PLATFORM == ESPMCU
+
 #define CLK_1 digitalWrite(CLK_PIN, HIGH)
 #define CLK_0 digitalWrite(CLK_PIN, LOW)
 #define DIN_1 digitalWrite(DIN_PIN, HIGH)
@@ -28,6 +33,12 @@
 #define STB_0 digitalWrite(STB_PIN, LOW)
 
 #define delay_us(us) delayMicroseconds(us)
+
+#endif
+
+#if PT_PLATFORM == STM32
+//todo 自己配置STM32的宏定义
+#endif
 
 /**
  * 初始化GPIO
