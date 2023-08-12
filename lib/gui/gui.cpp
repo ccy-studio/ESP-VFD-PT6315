@@ -2,14 +2,14 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-12 14:14:04
- * @LastEditTime: 2023-07-14 16:11:14
+ * @LastEditTime: 2023-08-13 00:33:00
  */
 #include "gui.h"
 
 extern vfd_gui_fonts fonts[VFD_GUI_FONT_LEN];
 
-u8 lightOff = 1; //背光开关
-u8 lightLevel = 7; //亮度级别
+u8 lightOff = 1;    // 背光开关
+u8 lightLevel = 7;  // 亮度级别
 
 // 标记-DIG4的RAM数据-实时更新
 static u8 dig4_colon_flag = 0;
@@ -95,4 +95,11 @@ void vfd_gui_set_colon(u8 display_state) {
 
 void vfd_gui_set_bck(u8 onOff) {
     lightOff = onOff;
+}
+
+/**
+ * 设置亮度等级 1~7
+ */
+void vfd_gui_set_blk_level(size_t level) {
+    lightLevel = level;
 }

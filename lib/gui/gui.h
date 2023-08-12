@@ -47,4 +47,8 @@ void vfd_gui_set_colon(u8 display_state);
 */
 void vfd_gui_set_bck(u8 onOff);
 
+/**
+ * 设置亮度等级 1~7
+ */
+void vfd_gui_set_blk_level(size_t level);
 #endif

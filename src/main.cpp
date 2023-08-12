@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 11:49:31
- * @LastEditTime: 2023-07-14 16:06:34
+ * @LastEditTime: 2023-08-13 00:46:47
  */
 #include <Arduino.h>
 #include <DNSServer.h>
@@ -26,7 +26,7 @@
 u8 colon = 0;
 
 WiFiManager wifiManager;
-u32 k1_last_time = 0; //按键1的上一次按下触发时间记录
+u32 k1_last_time = 0;  // 按键1的上一次按下触发时间记录
 tm timeinfo;
 String time_str = String();
 
@@ -35,10 +35,12 @@ u8 gui_page = 1;
 // 时分秒的样式 0 默认 HH:mm; 1 HH:mm:ss
 u8 gui_page_1_style = 0;
 
-u8 wifi_conn = 0; //标记wifi是否链接成功的状态
+u8 wifi_conn = 0;  // 标记wifi是否链接成功的状态
 
 u32 key_filter_sec = 0;  // 按键防抖
-u8 last_key_pin = 0; //记录上一次点击的按键PIN码
+u8 last_key_pin = 0;     // 记录上一次点击的按键PIN码
+
+u8 light_level = 7;  // 亮度等级
 
 IRAM_ATTR void handleKeyInterrupt();
 void configModeCallback(WiFiManager* myWiFiManager);
@@ -54,6 +56,7 @@ void setup() {
     pinMode(KEY2_PIN, INPUT);
     pinMode(KEY3_PIN, INPUT);
     ptInitGPIO();
+    vfd_gui_set_blk_level(light_level);
 
     // 注册按键中断函数
     attachInterrupt(digitalPinToInterrupt(KEY1_PIN), handleKeyInterrupt,
@@ -64,8 +67,8 @@ void setup() {
                     CHANGE);
 
     // 设置PWM的频率单位hz
-    analogWriteFreq(10000);
-    analogWrite(PWM_PIN, 128);
+    analogWriteFreq(20000);
+    analogWrite(PWM_PIN, 10);
     // 默认点亮LED
     digitalWrite(LED_PIN, LOW);
 
@@ -86,7 +89,7 @@ void setup() {
     if (!wifiManager.autoConnect(ssid.c_str(), NULL)) {
         Serial.println("Failed to connect and hit timeout.");
         while (1) {
-            //如果AP超时后就循环闪烁LED并VFD显示超时信息
+            // 如果AP超时后就循环闪烁LED并VFD显示超时信息
             delay(500);
             digitalWrite(LED_PIN, !digitalRead(LED_PIN));
             vfd_gui_set_text("timeout.");
@@ -99,7 +102,7 @@ void setup() {
     Serial.println(WiFi.localIP());
     wifi_conn = 1;
 
-    //到这里程序WIFI链接成功，获取时间提示显示加载文字。
+    // 到这里程序WIFI链接成功，获取时间提示显示加载文字。
     digitalWrite(LED_PIN, HIGH);
     vfd_gui_clear();
     vfd_gui_set_text("loading.");
@@ -165,16 +168,26 @@ IRAM_ATTR void handleKeyInterrupt() {
         // typec一侧的按键
         k1_last_time = micros();
         last_key_pin = KEY1_PIN;
-    } else if (digitalRead(KEY1_PIN)) {
-        // 低电平
-        u32 sec = (micros() - k1_last_time) / 1000;
-        if (k1_last_time != 0 && sec > 2000 && last_key_pin == KEY1_PIN) {
-            // 如果长按到松下有2秒,执行重置WIFI的操作
-            wifiManager.erase();
-            //重启
-            ESP.restart();
+        if (light_level == 1) {
+            light_level = 2;
+        } else if (light_level == 2) {
+            light_level = 7;
         } else {
-            k1_last_time = 0;
+            light_level = 1;
+        }
+        vfd_gui_set_blk_level(light_level);
+    } else if (digitalRead(KEY1_PIN)) {
+        if (digitalRead(KEY2_PIN) && digitalRead(KEY3_PIN)) {
+            // 低电平
+            u32 sec = (micros() - k1_last_time) / 1000;
+            if (k1_last_time != 0 && sec > 2000 && last_key_pin == KEY1_PIN) {
+                // 如果长按到松下有2秒,执行重置WIFI的操作
+                wifiManager.erase();
+                // 重启
+                ESP.restart();
+            } else {
+                k1_last_time = 0;
+            }
         }
     }
     if (!digitalRead(KEY2_PIN)) {
@@ -191,11 +204,11 @@ IRAM_ATTR void handleKeyInterrupt() {
 }
 
 void configModeCallback(WiFiManager* myWiFiManager) {
-    //如果发生配网的条件触发此方法
+    // 如果发生配网的条件触发此方法
     Serial.println("Entered config mode");
     Serial.println(WiFi.softAPIP());
     Serial.println(myWiFiManager->getConfigPortalSSID());
-    //将LED点亮提示正在配网
+    // 将LED点亮提示正在配网
     digitalWrite(LED_PIN, LOW);
     vfd_gui_clear();
     vfd_gui_set_text("config..");

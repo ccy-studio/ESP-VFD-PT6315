@@ -2,7 +2,7 @@
  * @Description:
  * @Author: chenzedeng
  * @Date: 2023-07-04 14:33:32
- * @LastEditTime: 2023-07-14 16:12:49
+ * @LastEditTime: 2023-08-13 00:31:51
  */
 #include "pt6315.h"
 
@@ -114,8 +114,7 @@ void sendDigAndData(uint8_t dig, const uint8_t* data, size_t len) {
     delay_us(10);
     // 写入数据
     for (size_t i = 0; i < len; i++) {
-        writeData(data[i],0);
-        // delay_us(10);
+        writeData(data[i], 0);
     }
     delay_us(10);
     STB_1;
